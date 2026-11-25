@@ -42,12 +42,22 @@ try:
         meter_id = reading["meter_id"]
         power_kw = reading["power_kw"]
 
-        # Add reading to the meter's rolling window
-        meter_readings[meter_id].append(power_kw)
+        # Get the latest readings for this meter
+        readings = meter_readings[meter_id]
+
+        # Add the current reading to the rolling window
+        readings.append(power_kw)
+
+        # Wait until we have five readings
+        if len(readings) < WINDOW_SIZE:
+            print(
+                f"Collecting readings for {meter_id}: "
+                f"{len(readings)}/{WINDOW_SIZE}"
+            )
+            continue
 
         # Calculate rolling average
-        readings = meter_readings[meter_id]
-        average = sum(readings) / len(readings)
+        average = sum(readings) / WINDOW_SIZE
 
         print(
             f"Meter: {meter_id} | "
